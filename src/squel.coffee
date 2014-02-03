@@ -726,6 +726,13 @@ class cls.WhereBlock extends cls.Block
   #
   # When the final query is constructed all the WHERE conditions are combined using the intersection (AND) operator.
   where: (condition, values...) ->
+    if condition == Object(condition)
+      for key, value of condition
+        @_where("#{key} = ?", value)
+    else
+      @_where(condition, values...)
+
+  _where: (condition, values...) ->
     condition = @_sanitizeCondition(condition)
     whereParam = { text: condition, values: [] }
 

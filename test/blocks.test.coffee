@@ -861,6 +861,10 @@ test['Blocks'] =
           'a = [hello] and b in ([1], [2], [3])'
         ], @inst.wheres
 
+      'also accepts an object': ->
+        @inst.where(a: 1, b: 'two')
+        assert.same "WHERE (a = 1) AND (b = 'two')", @inst.buildStr()
+
     'buildStr()':
       'output nothing if no conditions set': ->
         @inst.wheres = []
