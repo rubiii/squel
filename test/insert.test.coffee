@@ -103,6 +103,11 @@ test['INSERT builder'] =
         toString: ->
           assert.same @inst.toString(), 'INSERT INTO table (field, field2) VALUES (1, NULL)'
 
+      '>> set({ field2: 2, field3: 3 })':
+        beforeEach: -> @inst.set(field2: 2, field3: 3)
+        toString: ->
+          assert.same @inst.toString(), 'INSERT INTO table (field, field2, field3) VALUES (1, 2, 3)'
+
   'cloning': ->
     newinst = @inst.into('students').set('field', 1).clone()
     newinst.set('field', 2).set('field2', true)

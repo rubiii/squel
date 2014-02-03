@@ -124,6 +124,12 @@ test['UPDATE builder'] =
                 toString: ->
                   assert.same @inst.toString(), 'UPDATE table `t1`, table2 SET field = 1, field2 = NULL WHERE (a = 1) ORDER BY a ASC LIMIT 2'
 
+
+      '>> set({ field2: 2, field3: 3 })':
+        beforeEach: -> @inst.set(field2: 2, field3: 3)
+        toString: ->
+          assert.same @inst.toString(), 'UPDATE table `t1` SET field = 1, field2 = 2, field3 = 3'
+
     '>> table(table, t1).set("count = count + 1")':
       beforeEach: -> @inst.table('table', 't1').set('count = count + 1')
       toString: ->

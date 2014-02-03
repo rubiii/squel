@@ -571,12 +571,22 @@ class cls.SetFieldBlock extends cls.Block
     @fields = {}
 
   # Update the given field with the given value.
+  # Accepts either key and value, a single string or an object.
   # This will override any previously set value for the given field.
   set: (field, value) ->
+    if field == Object(field)
+      for key, value of field
+        @sanitizedSet(key, value)
+    else
+      @sanitizedSet(field, value)
+
+    @
+
+  sanitizedSet: (field, value) ->
     field = @_sanitizeField(field)
     value = @_sanitizeValue(value) if typeof value isnt 'undefined'
+
     @fields[field] = value
-    @
 
   buildStr: (queryBuilder) ->
     fieldNames = (field for own field of @fields)
