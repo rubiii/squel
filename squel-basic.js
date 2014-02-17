@@ -639,14 +639,28 @@ OTHER DEALINGS IN THE SOFTWARE.
     }
 
     SetFieldBlock.prototype.set = function(field, value) {
-      field = this._sanitizeField(field);
-      value = this._sanitizeValue(value);
-      this.fields[field] = value;
+      var key;
+      if (field === Object(field)) {
+        for (key in field) {
+          value = field[key];
+          this.sanitizedSet(key, value);
+        }
+      } else {
+        this.sanitizedSet(field, value);
+      }
       return this;
     };
 
+    SetFieldBlock.prototype.sanitizedSet = function(field, value) {
+      field = this._sanitizeField(field);
+      if (typeof value !== 'undefined') {
+        value = this._sanitizeValue(value);
+      }
+      return this.fields[field] = value;
+    };
+
     SetFieldBlock.prototype.buildStr = function(queryBuilder) {
-      var field, fieldNames, fields, _i, _len;
+      var field, fieldNames, fields, value, _i, _len;
       fieldNames = (function() {
         var _ref3, _results;
         _ref3 = this.fields;
@@ -666,7 +680,12 @@ OTHER DEALINGS IN THE SOFTWARE.
         if ("" !== fields) {
           fields += ", ";
         }
-        fields += "" + field + " = " + (this._formatValue(this.fields[field]));
+        value = this.fields[field];
+        if (typeof value === 'undefined') {
+          fields += field;
+        } else {
+          fields += "" + field + " = " + (this._formatValue(value));
+        }
       }
       return "SET " + fields;
     };
@@ -878,6 +897,21 @@ OTHER DEALINGS IN THE SOFTWARE.
     }
 
     WhereBlock.prototype.where = function() {
+      var condition, key, value, values, _results;
+      condition = arguments[0], values = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (condition === Object(condition)) {
+        _results = [];
+        for (key in condition) {
+          value = condition[key];
+          _results.push(this._where("" + key + " = ?", value));
+        }
+        return _results;
+      } else {
+        return this._where.apply(this, [condition].concat(__slice.call(values)));
+      }
+    };
+
+    WhereBlock.prototype._where = function() {
       var condition, inValues, item, value, values, whereParam, _i, _j, _len, _len1;
       condition = arguments[0], values = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       condition = this._sanitizeCondition(condition);
